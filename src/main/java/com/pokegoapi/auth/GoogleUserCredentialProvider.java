@@ -23,7 +23,11 @@ import com.pokegoapi.util.SystemTimeImpl;
 import com.pokegoapi.util.Time;
 import com.squareup.moshi.Moshi;
 import lombok.Getter;
-import okhttp3.*;
+import okhttp3.HttpUrl;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
 
 import java.io.IOException;
 
@@ -37,7 +41,6 @@ public class GoogleUserCredentialProvider extends CredentialProvider {
 	//We try and refresh token 5 minutes before it actually expires
 	private static final long REFRESH_TOKEN_BUFFER_TIME = 5 * 60 * 1000;
 	private final OkHttpClient client;
-
 
 	private final Time time;
 
@@ -147,8 +150,6 @@ public class GoogleUserCredentialProvider extends CredentialProvider {
 	}
 
 
-
-
 	/**
 	 * Uses an access code to login and get tokens
 	 */
@@ -186,12 +187,6 @@ public class GoogleUserCredentialProvider extends CredentialProvider {
 		} catch (IOException e) {
 			throw new RemoteServerException("Failed to unmarshell the Json response to fetch tokenId", e);
 		}
-;
-
-
-
-
-
 
 		Log.d(TAG, "Got token: " + googleAuth.getAccessToken());
 
@@ -200,10 +195,7 @@ public class GoogleUserCredentialProvider extends CredentialProvider {
 		tokenId = googleAuth.getIdToken();
 		refreshToken = googleAuth.getRefreshToken();
 	}
-
-
-
-
+	
 	@Override
 	public String getTokenId() throws LoginFailedException, RemoteServerException {
 		if (isTokenIdExpired()) {
@@ -236,6 +228,4 @@ public class GoogleUserCredentialProvider extends CredentialProvider {
 			return false;
 		}
 	}
-
-
 }
