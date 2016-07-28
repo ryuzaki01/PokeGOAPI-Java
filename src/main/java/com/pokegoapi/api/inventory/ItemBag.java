@@ -19,10 +19,13 @@ package com.pokegoapi.api.inventory;
 import POGOProtos.Inventory.Item.ItemDataOuterClass;
 import POGOProtos.Inventory.Item.ItemDataOuterClass.ItemData;
 import POGOProtos.Inventory.Item.ItemIdOuterClass.ItemId;
-import POGOProtos.Networking.Requests.Messages.RecycleInventoryItemMessageOuterClass.RecycleInventoryItemMessage;
 import POGOProtos.Networking.Requests.RequestTypeOuterClass;
+import POGOProtos.Networking.Requests.Messages.UseItemXpBoostMessageOuterClass.UseItemXpBoostMessage;
+import POGOProtos.Networking.Responses.UseItemXpBoostResponseOuterClass;
+import POGOProtos.Networking.Responses.UseItemXpBoostResponseOuterClass.UseItemXpBoostResponse;
+import POGOProtos.Networking.Requests.Messages.RecycleInventoryItemMessageOuterClass.RecycleInventoryItemMessage;
 import POGOProtos.Networking.Responses.RecycleInventoryItemResponseOuterClass;
-import POGOProtos.Networking.Responses.RecycleInventoryItemResponseOuterClass.RecycleInventoryItemResponse.Result;
+import POGOProtos.Networking.Responses.RecycleInventoryItemResponseOuterClass.RecycleInventoryItemResponse;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.pokegoapi.api.PokemonGo;
 import com.pokegoapi.exceptions.LoginFailedException;
@@ -61,7 +64,8 @@ public class ItemBag {
 	 * @throws RemoteServerException the remote server exception
 	 * @throws LoginFailedException  the login failed exception
 	 */
-	public Result removeItem(ItemId id, int quantity) throws RemoteServerException, LoginFailedException {
+	public RecycleInventoryItemResponseOuterClass.RecycleInventoryItemResponse.Result removeItem(ItemId id, int quantity)
+			throws RemoteServerException, LoginFailedException {
 		Item item = getItem(id);
 		if (item.getCount() < quantity) {
 			throw new IllegalArgumentException("You cannont remove more quantity than you have");
@@ -85,6 +89,37 @@ public class ItemBag {
 		if (response.getResult() == RecycleInventoryItemResponseOuterClass.RecycleInventoryItemResponse.Result.SUCCESS) {
 			item.setCount(response.getNewCount());
 		}
+		return response.getResult();
+	}
+
+	/**
+	 * Use XP Boost
+	 *
+	 * @return the result
+	 * @throws RemoteServerException the remote server exception
+	 * @throws LoginFailedException  the login failed exception
+	 */
+	public UseItemXpBoostResponseOuterClass.UseItemXpBoostResponse.Result useLuckyEgg()
+			throws RemoteServerException, LoginFailedException {
+		Item item = getItem(ItemId.ITEM_LUCKY_EGG);
+		if (item.getCount() < 1) {
+			throw new IllegalArgumentException("You don't have that item");
+		}
+
+		UseItemXpBoostMessage msg = UseItemXpBoostMessage.newBuilder()
+				.setItemId(ItemId.ITEM_LUCKY_EGG)
+				.build();
+
+		ServerRequest serverRequest = new ServerRequest(RequestTypeOuterClass.RequestType.USE_ITEM_XP_BOOST, msg);
+		pgo.getRequestHandler().sendServerRequests(serverRequest);
+
+		UseItemXpBoostResponseOuterClass.UseItemXpBoostResponse response;
+		try {
+			response = UseItemXpBoostResponseOuterClass.UseItemXpBoostResponse.parseFrom(serverRequest.getData());
+		} catch (InvalidProtocolBufferException e) {
+			throw new RemoteServerException(e);
+		}
+
 		return response.getResult();
 	}
 

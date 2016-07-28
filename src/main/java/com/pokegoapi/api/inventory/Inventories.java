@@ -136,11 +136,11 @@ public class Inventories {
 			}
 
 			// candyjar
-			if (itemData.getCandy().getFamilyId() != PokemonFamilyIdOuterClass.PokemonFamilyId.UNRECOGNIZED
-					&& itemData.getCandy().getFamilyId() != PokemonFamilyIdOuterClass.PokemonFamilyId.FAMILY_UNSET) {
+			if (itemData.getPokemonFamily().getFamilyId() != PokemonFamilyIdOuterClass.PokemonFamilyId.UNRECOGNIZED
+					&& itemData.getPokemonFamily().getFamilyId() != PokemonFamilyIdOuterClass.PokemonFamilyId.FAMILY_UNSET) {
 				candyjar.setCandy(
-						itemData.getCandy().getFamilyId(),
-						itemData.getCandy().getCandy()
+						itemData.getPokemonFamily().getFamilyId(),
+						itemData.getPokemonFamily().getCandy()
 				);
 			}
 			// player stats
